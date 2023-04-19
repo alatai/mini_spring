@@ -90,7 +90,7 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry
 	 * 利用反射创建实例
 	 */
 	private Object doCreateBean(BeanDefinition beanDefinition) {
-		Class<?> clz = null;
+		Class<?> clz;
 		Object obj = null;
 		Constructor<?> constructor;
 
