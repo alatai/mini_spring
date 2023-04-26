@@ -1,4 +1,4 @@
-package com.alatai.mini.bean;
+package com.alatai.mini.bean.factory.config;
 
 /**
  * 构造器参数映射
@@ -7,18 +7,18 @@ package com.alatai.mini.bean;
  * @version 1.0
  * @date 2023/03/19 15:03
  */
-public class ArgumentValue {
+public class ConstructorArgumentValue {
 
     private String type;
     private String name;
     private Object value;
 
-    public ArgumentValue(String type, Object value) {
+    public ConstructorArgumentValue(String type, Object value) {
         this.type = type;
         this.value = value;
     }
 
-    public ArgumentValue(String type, String name, Object value) {
+    public ConstructorArgumentValue(String type, String name, Object value) {
         this.type = type;
         this.name = name;
         this.value = value;

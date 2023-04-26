@@ -2,10 +2,15 @@ package com.alatai.mini.context;
 
 import com.alatai.mini.bean.BeanException;
 import com.alatai.mini.bean.factory.BeanFactory;
-import com.alatai.mini.bean.factory.SimpleBeanFactory;
+import com.alatai.mini.bean.factory.annotation.AutowiredAnnotationBeanPostProcessor;
+import com.alatai.mini.bean.factory.config.AutowireCapableBeanFactory;
+import com.alatai.mini.bean.factory.config.BeanFactoryPostProcessor;
 import com.alatai.mini.bean.factory.xml.XmlBeanDefinitionReader;
 import com.alatai.mini.core.ClassPathXmlResource;
 import com.alatai.mini.core.Resource;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 解析指定路径下的 XML 构建应用上下文
@@ -16,7 +21,8 @@ import com.alatai.mini.core.Resource;
  */
 public class ClassPathXmlApplicationContext implements BeanFactory {
 
-	private final SimpleBeanFactory beanFactory;
+	private final AutowireCapableBeanFactory beanFactory;
+	private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<>();
 
 	/**
 	 * context 负责整合容器的启动过程
@@ -28,13 +34,17 @@ public class ClassPathXmlApplicationContext implements BeanFactory {
 
 	public ClassPathXmlApplicationContext(String filename, boolean isRefresh) {
 		Resource resource = new ClassPathXmlResource(filename);
-		SimpleBeanFactory simpleBeanFactory = new SimpleBeanFactory();
-		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(simpleBeanFactory);
+		AutowireCapableBeanFactory autowireCapableBeanFactory = new AutowireCapableBeanFactory();
+		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(autowireCapableBeanFactory);
 		reader.loadBeanDefinitions(resource);
-		this.beanFactory = simpleBeanFactory;
+		this.beanFactory = autowireCapableBeanFactory;
 
-		if (!isRefresh) {
-			this.beanFactory.refresh();
+		if (isRefresh) {
+			try {
+				refresh();
+			} catch (BeanException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -45,7 +55,11 @@ public class ClassPathXmlApplicationContext implements BeanFactory {
 
 	@Override
 	public boolean containsBean(String name) {
-		return false;
+		return this.beanFactory.containsBean(name);
+	}
+
+	public void registerBean(String beanName, Object obj) {
+		this.beanFactory.registerBean(beanName, obj);
 	}
 
 	@Override
@@ -63,5 +77,24 @@ public class ClassPathXmlApplicationContext implements BeanFactory {
 		return null;
 	}
 
+	public List<BeanFactoryPostProcessor> getBeanFactoryPostProcessors() {
+		return this.beanFactoryPostProcessors;
+	}
 
+	public void addBeanFactoryPostProcessor(BeanFactoryPostProcessor postProcessor) {
+		this.beanFactoryPostProcessors.add(postProcessor);
+	}
+
+	public void refresh() throws BeanException, IllegalStateException {
+		registerBeanPostProcessors(this.beanFactory);
+		onRefresh();
+	}
+
+	private void registerBeanPostProcessors(AutowireCapableBeanFactory beanFactory) {
+		beanFactory.addBeanPostProcessor(new AutowiredAnnotationBeanPostProcessor());
+	}
+
+	private void onRefresh() {
+		this.beanFactory.refresh();
+	}
 }

@@ -1,6 +1,6 @@
 package com.alatai.mini.bean.factory;
 
-import com.alatai.mini.bean.ArgumentValues;
+import com.alatai.mini.bean.factory.config.ConstructorArgumentValues;
 import com.alatai.mini.bean.PropertyValues;
 
 /**
@@ -20,7 +20,7 @@ public class BeanDefinition {
     private boolean lazyInit = false;
     // 记录 Bean 之间的依赖关系
     private String[] dependsOn;
-    private ArgumentValues constructorArgumentValues;
+    private ConstructorArgumentValues constructorArgumentValues;
     private PropertyValues propertyValues;
     // 当一个 Bean 构造好并实例化之后，是否要让框架调用初始化方法
     private String initMethodName;
@@ -66,11 +66,11 @@ public class BeanDefinition {
         this.dependsOn = dependsOn;
     }
 
-    public ArgumentValues getConstructorArgumentValues() {
+    public ConstructorArgumentValues getConstructorArgumentValues() {
         return constructorArgumentValues;
     }
 
-    public void setConstructorArgumentValues(ArgumentValues constructorArgumentValues) {
+    public void setConstructorArgumentValues(ConstructorArgumentValues constructorArgumentValues) {
         this.constructorArgumentValues = constructorArgumentValues;
     }
 

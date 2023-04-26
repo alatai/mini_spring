@@ -1,10 +1,10 @@
 package com.alatai.mini.bean.factory.xml;
 
-import com.alatai.mini.bean.ArgumentValue;
-import com.alatai.mini.bean.ArgumentValues;
+import com.alatai.mini.bean.factory.config.ConstructorArgumentValue;
+import com.alatai.mini.bean.factory.config.ConstructorArgumentValues;
 import com.alatai.mini.bean.PropertyValues;
 import com.alatai.mini.bean.factory.BeanDefinition;
-import com.alatai.mini.bean.factory.SimpleBeanFactory;
+import com.alatai.mini.bean.factory.support.AbstractBeanFactory;
 import com.alatai.mini.core.Resource;
 import org.dom4j.Element;
 
@@ -21,10 +21,10 @@ import java.util.Objects;
  */
 public class XmlBeanDefinitionReader {
 
-	private final SimpleBeanFactory simpleBeanFactory;
+	private final AbstractBeanFactory abstractBeanFactory;
 
-	public XmlBeanDefinitionReader(SimpleBeanFactory simpleBeanFactory) {
-		this.simpleBeanFactory = simpleBeanFactory;
+	public XmlBeanDefinitionReader(AbstractBeanFactory abstractBeanFactory) {
+		this.abstractBeanFactory = abstractBeanFactory;
 	}
 
 	/**
@@ -67,17 +67,17 @@ public class XmlBeanDefinitionReader {
 
 			// 设置构造器参数
 			List<Element> constructorElements = element.elements("constructor-arg");
-			ArgumentValues argumentValues = new ArgumentValues();
+			ConstructorArgumentValues constructorArgumentValues = new ConstructorArgumentValues();
 
 			for (Element constructorElement : constructorElements) {
 				String aType = constructorElement.attributeValue("type");
 				String aName = constructorElement.attributeValue("name");
 				String aValue = constructorElement.attributeValue("value");
-				argumentValues.addArgumentValue(new ArgumentValue(aType, aName, aValue));
+				constructorArgumentValues.addArgumentValue(new ConstructorArgumentValue(aType, aName, aValue));
 			}
 
-			beanDefinition.setConstructorArgumentValues(argumentValues);
-			this.simpleBeanFactory.registerBeanDefinition(beanID, beanDefinition);
+			beanDefinition.setConstructorArgumentValues(constructorArgumentValues);
+			this.abstractBeanFactory.registerBeanDefinition(beanID, beanDefinition);
 		}
 
 	}

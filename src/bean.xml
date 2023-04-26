@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <beans>
     <!-- basebaseservice -->
-    <bean id="basebaseservice"
+    <bean id="bbs"
           class="com.alatai.test.service.impl.BaseBaseService">
         <property type="com.alatai.test.service.impl.AServiceImpl" name="as"
                   ref="aservice"/>
@@ -17,7 +17,7 @@
     </bean>
     <!-- baseservice -->
     <bean id="baseservice" class="com.alatai.test.service.impl.BaseService">
-        <property type="com.alatai.test.service.impl.BaseBaseService"
-                  name="bbs" ref="basebaseservice"/>
+        <!-- <property type="com.alatai.test.service.impl.BaseBaseService" -->
+        <!--           name="bbs" ref="basebaseservice"/> -->
     </bean>
 </beans>

@@ -1,22 +1,25 @@
-package com.alatai.mini.bean.factory;
+package com.alatai.mini.bean.factory.support;
 
-import com.alatai.mini.bean.*;
-import com.alatai.mini.bean.factory.support.BeanDefinitionRegistry;
-import com.alatai.mini.bean.factory.support.DefaultSingletonBeanRegistry;
+import com.alatai.mini.bean.BeanException;
+import com.alatai.mini.bean.PropertyValue;
+import com.alatai.mini.bean.PropertyValues;
+import com.alatai.mini.bean.factory.BeanDefinition;
+import com.alatai.mini.bean.factory.BeanFactory;
+import com.alatai.mini.bean.factory.config.ConstructorArgumentValue;
+import com.alatai.mini.bean.factory.config.ConstructorArgumentValues;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * BeanFactory 简单实现
- *
  * @author alatai
  * @version 1.0
- * @date 2023/03/18 21:47
+ * @date 2023/04/24 23:16
  */
-public class SimpleBeanFactory extends DefaultSingletonBeanRegistry
+public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
 		implements BeanFactory, BeanDefinitionRegistry {
 
 	private final Map<String, BeanDefinition> beanDefinitionMap =
@@ -24,9 +27,6 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry
 	private final List<String> beanDefinitionNames = new ArrayList<>();
 	// 存放早期实例（解决循环依赖问题）
 	private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
-
-	public SimpleBeanFactory() {
-	}
 
 	/**
 	 * 对所有的 Bean 调用一次 getBean，利用其中的 createBean 创建 Bean 实例
@@ -46,20 +46,30 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry
 	 */
 	@Override
 	public Object getBean(String beanName) throws BeanException {
+		// 先直接从容器中获取实例
 		Object singleton = this.getSingleton(beanName);
 
 		if (singleton == null) {
 			// 尝试获取早期实例（毛坯实例）
 			singleton = earlySingletonObjects.get(beanName);
 
+			// 若不存在毛坯实例，则创建 bean 并注册
 			if (singleton == null) {
 				BeanDefinition beanDefinition = beanDefinitionMap.get(beanName);
 				singleton = createBean(beanDefinition);
 				this.registerBean(beanName, singleton);
 
+				// 进行 beanPostProcessor处理
+				// 1.postProcessorBeforeInitialization
+				applyBeanPostProcessorBeforeInitialization(singleton, beanName);
+
+				// 2.init method
 				if (beanDefinition.getInitMethodName() != null) {
-					// init method
+					invokeInitMethod(beanDefinition, singleton);
 				}
+
+				// 3.postProcessorAfterInitialization
+				applyBeanPostProcessorAfterInitialization(singleton, beanName);
 			}
 		}
 
@@ -70,8 +80,20 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry
 		return singleton;
 	}
 
+	private void invokeInitMethod(BeanDefinition beanDefinition, Object obj) {
+		try {
+			Class<?> clz = beanDefinition.getClass();
+			Method method = clz.getMethod(beanDefinition.getInitMethodName());
+			method.invoke(obj);
+		} catch (NoSuchMethodException | IllegalAccessException |
+		         InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	private Object createBean(BeanDefinition beanDefinition) {
 		Class<?> clz;
+		// 创建毛坯实例
 		Object obj = doCreateBean(beanDefinition);
 		// 存放到早期实例缓存
 		this.earlySingletonObjects.put(beanDefinition.getId(), obj);
@@ -96,29 +118,29 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry
 
 		try {
 			clz = Class.forName(beanDefinition.getClassName());
-			ArgumentValues argumentValues = beanDefinition.getConstructorArgumentValues();
+			ConstructorArgumentValues constructorArgumentValues = beanDefinition.getConstructorArgumentValues();
 
-			if (!argumentValues.isEmpty()) {
-				Class<?>[] paramTypes = new Class<?>[argumentValues.getArgumentCount()];
-				Object[] paramValues = new Object[argumentValues.getArgumentCount()];
+			if (!constructorArgumentValues.isEmpty()) {
+				Class<?>[] paramTypes = new Class<?>[constructorArgumentValues.getArgumentCount()];
+				Object[] paramValues = new Object[constructorArgumentValues.getArgumentCount()];
 
-				for (int i = 0; i < argumentValues.getArgumentCount(); i++) {
-					ArgumentValue argumentValue = argumentValues.getIndexedArgumentValue(i);
+				for (int i = 0; i < constructorArgumentValues.getArgumentCount(); i++) {
+					ConstructorArgumentValue constructorArgumentValue = constructorArgumentValues.getIndexedArgumentValue(i);
 
-					if (Objects.equals(argumentValue.getType(), "String")
-							|| Objects.equals(argumentValue.getType(), "java.lang.String")) {
+					if (Objects.equals(constructorArgumentValue.getType(), "String")
+							|| Objects.equals(constructorArgumentValue.getType(), "java.lang.String")) {
 						paramTypes[i] = String.class;
-						paramValues[i] = argumentValue.getValue();
-					} else if (Objects.equals(argumentValue.getType(), "Integer")
-							|| Objects.equals(argumentValue.getType(), "java.lang.Integer")) {
+						paramValues[i] = constructorArgumentValue.getValue();
+					} else if (Objects.equals(constructorArgumentValue.getType(), "Integer")
+							|| Objects.equals(constructorArgumentValue.getType(), "java.lang.Integer")) {
 						paramTypes[i] = Integer.class;
-						paramValues[i] = Integer.valueOf((String) argumentValue.getValue());
-					} else if (Objects.equals(argumentValue.getType(), "int")) {
+						paramValues[i] = Integer.valueOf((String) constructorArgumentValue.getValue());
+					} else if (Objects.equals(constructorArgumentValue.getType(), "int")) {
 						paramTypes[i] = int.class;
-						paramValues[i] = Integer.valueOf((String) argumentValue.getValue());
+						paramValues[i] = Integer.valueOf((String) constructorArgumentValue.getValue());
 					} else {
 						paramTypes[i] = String.class;
-						paramValues[i] = argumentValue.getValue();
+						paramValues[i] = constructorArgumentValue.getValue();
 					}
 				}
 
@@ -188,6 +210,10 @@ public class SimpleBeanFactory extends DefaultSingletonBeanRegistry
 			}
 		}
 	}
+
+	abstract public Object applyBeanPostProcessorBeforeInitialization(Object existingBean, String beanName) throws BeanException;
+
+	abstract public Object applyBeanPostProcessorAfterInitialization(Object existingBean, String beanName) throws BeanException;
 
 	/**
 	 * 注册 BeanDefinition

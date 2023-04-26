@@ -1,5 +1,6 @@
 package com.alatai.test.service.impl;
 
+import com.alatai.mini.bean.factory.annotation.Autowired;
 import com.alatai.test.service.AService;
 
 /**
@@ -9,6 +10,7 @@ import com.alatai.test.service.AService;
  */
 public class BaseService {
 
+	@Autowired
 	private BaseBaseService bbs;
 
 	public BaseBaseService getBbs() {
