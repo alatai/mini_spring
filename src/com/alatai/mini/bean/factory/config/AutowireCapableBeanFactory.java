@@ -1,11 +1,7 @@
 package com.alatai.mini.bean.factory.config;
 
 import com.alatai.mini.bean.BeanException;
-import com.alatai.mini.bean.factory.annotation.AutowiredAnnotationBeanPostProcessor;
-import com.alatai.mini.bean.factory.support.AbstractBeanFactory;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.alatai.mini.bean.factory.BeanFactory;
 
 /**
  * Autowired 注入用
@@ -14,52 +10,17 @@ import java.util.List;
  * @version 1.0
  * @date 2023/04/24 22:57
  */
-public class AutowireCapableBeanFactory extends AbstractBeanFactory {
+public interface AutowireCapableBeanFactory extends BeanFactory {
 
-	private final List<AutowiredAnnotationBeanPostProcessor> beanPostProcessors = new ArrayList<>();
+	int AUTOWIRE_NO = 0;
 
-	public void addBeanPostProcessor(AutowiredAnnotationBeanPostProcessor beanPostProcessor) {
-		this.beanPostProcessors.remove(beanPostProcessor);
-		this.beanPostProcessors.add(beanPostProcessor);
-	}
+	int AUTOWIRE_BY_NAME = 1;
 
-	public int getBeanPostProcessorCount() {
-		return this.beanPostProcessors.size();
-	}
+	int AUTOWIRE_BY_TYPE = 2;
 
-	public List<AutowiredAnnotationBeanPostProcessor> getBeanPostProcessors() {
-		return this.beanPostProcessors;
-	}
+	Object applyBeanPostProcessorBeforeInitialization(Object existingBean,
+	                                                  String beanName) throws BeanException;
 
-	@Override
-	public Object applyBeanPostProcessorBeforeInitialization(Object existingBean, String beanName)
-			throws BeanException {
-		Object result = existingBean;
-		for (AutowiredAnnotationBeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
-			beanPostProcessor.setBeanFactory(this);
-			result = beanPostProcessor.postProcessBeforeInitialization(result, beanName);
-
-			if (result == null) {
-				return null;
-			}
-		}
-
-		return result;
-	}
-
-	@Override
-	public Object applyBeanPostProcessorAfterInitialization(Object existingBean, String beanName)
-			throws BeanException {
-		Object result = existingBean;
-		for (AutowiredAnnotationBeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
-			beanPostProcessor.setBeanFactory(this);
-			result = beanPostProcessor.postProcessAfterInitialization(result, beanName);
-
-			if (result == null) {
-				return null;
-			}
-		}
-
-		return result;
-	}
+	Object applyBeanPostProcessorAfterInitialization(Object existingBean,
+	                                                 String beanName) throws BeanException;
 }

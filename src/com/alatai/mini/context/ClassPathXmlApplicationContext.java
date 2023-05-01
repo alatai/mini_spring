@@ -2,9 +2,10 @@ package com.alatai.mini.context;
 
 import com.alatai.mini.bean.BeanException;
 import com.alatai.mini.bean.factory.BeanFactory;
+import com.alatai.mini.bean.factory.support.DefaultListableBeanFactory;
 import com.alatai.mini.bean.factory.annotation.AutowiredAnnotationBeanPostProcessor;
-import com.alatai.mini.bean.factory.config.AutowireCapableBeanFactory;
 import com.alatai.mini.bean.factory.config.BeanFactoryPostProcessor;
+import com.alatai.mini.bean.factory.config.ConfigurableListableBeanFactory;
 import com.alatai.mini.bean.factory.xml.XmlBeanDefinitionReader;
 import com.alatai.mini.core.ClassPathXmlResource;
 import com.alatai.mini.core.Resource;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 public class ClassPathXmlApplicationContext implements BeanFactory {
 
-	private final AutowireCapableBeanFactory beanFactory;
+	private final DefaultListableBeanFactory beanFactory;
 	private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<>();
 
 	/**
@@ -34,10 +35,10 @@ public class ClassPathXmlApplicationContext implements BeanFactory {
 
 	public ClassPathXmlApplicationContext(String filename, boolean isRefresh) {
 		Resource resource = new ClassPathXmlResource(filename);
-		AutowireCapableBeanFactory autowireCapableBeanFactory = new AutowireCapableBeanFactory();
-		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(autowireCapableBeanFactory);
+		DefaultListableBeanFactory defaultListableBeanFactory = new DefaultListableBeanFactory();
+		XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(defaultListableBeanFactory);
 		reader.loadBeanDefinitions(resource);
-		this.beanFactory = autowireCapableBeanFactory;
+		this.beanFactory = defaultListableBeanFactory;
 
 		if (isRefresh) {
 			try {
@@ -90,7 +91,7 @@ public class ClassPathXmlApplicationContext implements BeanFactory {
 		onRefresh();
 	}
 
-	private void registerBeanPostProcessors(AutowireCapableBeanFactory beanFactory) {
+	private void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
 		beanFactory.addBeanPostProcessor(new AutowiredAnnotationBeanPostProcessor());
 	}
 

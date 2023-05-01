@@ -4,7 +4,7 @@ import com.alatai.mini.bean.BeanException;
 import com.alatai.mini.bean.PropertyValue;
 import com.alatai.mini.bean.PropertyValues;
 import com.alatai.mini.bean.factory.BeanDefinition;
-import com.alatai.mini.bean.factory.BeanFactory;
+import com.alatai.mini.bean.factory.config.ConfigurableBeanFactory;
 import com.alatai.mini.bean.factory.config.ConstructorArgumentValue;
 import com.alatai.mini.bean.factory.config.ConstructorArgumentValues;
 
@@ -20,13 +20,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2023/04/24 23:16
  */
 public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry
-		implements BeanFactory, BeanDefinitionRegistry {
+		implements ConfigurableBeanFactory, BeanDefinitionRegistry {
 
-	private final Map<String, BeanDefinition> beanDefinitionMap =
+	protected final Map<String, BeanDefinition> beanDefinitionMap =
 			new ConcurrentHashMap<>(256);
-	private final List<String> beanDefinitionNames = new ArrayList<>();
+	protected final List<String> beanDefinitionNames = new ArrayList<>();
 	// 存放早期实例（解决循环依赖问题）
-	private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
+	protected final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
 	/**
 	 * 对所有的 Bean 调用一次 getBean，利用其中的 createBean 创建 Bean 实例

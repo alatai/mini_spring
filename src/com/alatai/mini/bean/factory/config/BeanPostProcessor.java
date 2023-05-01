@@ -1,6 +1,7 @@
 package com.alatai.mini.bean.factory.config;
 
 import com.alatai.mini.bean.BeanException;
+import com.alatai.mini.bean.factory.BeanFactory;
 
 /**
  * Bean 处理器 Processor，由处理器来解释注解
@@ -15,5 +16,5 @@ public interface BeanPostProcessor {
 
 	Object postProcessAfterInitialization(Object bean, String beanName) throws BeanException;
 
-
+	void setBeanFactory(BeanFactory beanFactory);
 }
