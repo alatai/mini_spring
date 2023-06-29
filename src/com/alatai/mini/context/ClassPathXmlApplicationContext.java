@@ -1,7 +1,6 @@
 package com.alatai.mini.context;
 
 import com.alatai.mini.bean.BeanException;
-import com.alatai.mini.bean.factory.BeanFactory;
 import com.alatai.mini.bean.factory.support.DefaultListableBeanFactory;
 import com.alatai.mini.bean.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import com.alatai.mini.bean.factory.config.BeanFactoryPostProcessor;
@@ -20,7 +19,7 @@ import java.util.List;
  * @version 1.0
  * @date 2023/03/17 1:13
  */
-public class ClassPathXmlApplicationContext implements BeanFactory {
+public class ClassPathXmlApplicationContext extends AbstractApplicationContext {
 
 	private final DefaultListableBeanFactory beanFactory;
 	private final List<BeanFactoryPostProcessor> beanFactoryPostProcessors = new ArrayList<>();
@@ -64,38 +63,60 @@ public class ClassPathXmlApplicationContext implements BeanFactory {
 	}
 
 	@Override
-	public boolean isSingleton(String name) {
-		return false;
-	}
-
-	@Override
-	public boolean isPrototype(String name) {
-		return false;
-	}
-
-	@Override
-	public Class<?> getType(String name) {
-		return null;
+	public ConfigurableListableBeanFactory getBeanFactory() throws IllegalStateException {
+		return this.beanFactory;
 	}
 
 	public List<BeanFactoryPostProcessor> getBeanFactoryPostProcessors() {
 		return this.beanFactoryPostProcessors;
 	}
 
+	@Override
+
 	public void addBeanFactoryPostProcessor(BeanFactoryPostProcessor postProcessor) {
 		this.beanFactoryPostProcessors.add(postProcessor);
 	}
 
+	@Override
 	public void refresh() throws BeanException, IllegalStateException {
 		registerBeanPostProcessors(this.beanFactory);
 		onRefresh();
 	}
 
-	private void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
+	@Override
+	void registerListeners() {
+		ApplicationListener listener = new ApplicationListener();
+		this.getApplicationEventPublisher().addApplicationListener(listener);
+	}
+
+	@Override
+	void initApplicationEventPublisher() {
+		ApplicationEventPublisher aep = new SimpleApplicationEventPublisher();
+		this.setApplicationEventPublisher(aep);
+	}
+
+	@Override
+	void postProcessBeanFactory(ConfigurableListableBeanFactory bf) {
+
+	}
+
+	@Override
+	public void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
 		beanFactory.addBeanPostProcessor(new AutowiredAnnotationBeanPostProcessor());
 	}
 
-	private void onRefresh() {
+	@Override
+	public void addApplicationListener(ApplicationListener listener) {
+		this.getApplicationEventPublisher().addApplicationListener(listener);
+	}
+
+	@Override
+	public void onRefresh() {
 		this.beanFactory.refresh();
+	}
+
+	@Override
+	void finishRefresh() {
+		publishEvent(new ContextRefreshEvent("Context Refreshed..."));
 	}
 }
