@@ -1,6 +1,4 @@
-package com.alatai.test.service.impl;
-
-import com.alatai.test.service.AService;
+package com.alatai.mini.test.service.impl;
 
 /**
  * 测试依赖关系

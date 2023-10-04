@@ -1,8 +1,8 @@
-package com.alatai.test;
+package com.alatai.mini.test;
 
 import com.alatai.mini.bean.BeanException;
 import com.alatai.mini.context.ClassPathXmlApplicationContext;
-import com.alatai.test.service.AService;
+import com.alatai.mini.test.service.AService;
 
 /**
  * @author alatai

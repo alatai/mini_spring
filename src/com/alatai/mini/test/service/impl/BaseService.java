@@ -1,7 +1,6 @@
-package com.alatai.test.service.impl;
+package com.alatai.mini.test.service.impl;
 
 import com.alatai.mini.bean.factory.annotation.Autowired;
-import com.alatai.test.service.AService;
 
 /**
  * @author alatai

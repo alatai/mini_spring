@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:web="http://xmlns.jcp.org/xml/ns/javaee"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID">
+    <servlet>
+        <servlet-name>minisMVC</servlet-name>
+        <!-- 指定Servlet对应类，也是Web程序的核心代码 -->
+        <servlet-class>com.minis.web.DispatcherServlet</servlet-class>
+        <init-param>
+            <!-- 初始化配置文件地址，表示所有的配置参数都由这里引入 -->
+            <!-- contextConfigLocation：它配置了控制器要找的逻辑 -->
+            <!-- 处理类的文件minisMVC-servlet.xml -->
+            <param-name>contextConfigLocation</param-name>
+            <param-value>/WEB-INF/minisMVC-servlet.xml</param-value>
+        </init-param>
+        <!-- 启动加载优先度 -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <!-- servlet自定义名称，请求拦截与映射匹配 -->
+        <servlet-name>minisMVC</servlet-name>
+        <!-- url，当前表示拦截所有URL -->
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+</web-app>

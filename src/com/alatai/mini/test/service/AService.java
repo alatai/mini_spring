@@ -1,4 +1,4 @@
-package com.alatai.test.service;
+package com.alatai.mini.test.service;
 
 /**
  * @author alatai

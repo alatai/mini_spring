@@ -1,6 +1,6 @@
-package com.alatai.test.service.impl;
+package com.alatai.mini.test.service.impl;
 
-import com.alatai.test.service.AService;
+import com.alatai.mini.test.service.AService;
 
 /**
  * @author alatai
