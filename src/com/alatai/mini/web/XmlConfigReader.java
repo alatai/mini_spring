@@ -1,5 +1,6 @@
 package com.alatai.mini.web;
 
+import com.alatai.mini.core.Resource;
 import org.dom4j.Element;
 
 import java.util.HashMap;
