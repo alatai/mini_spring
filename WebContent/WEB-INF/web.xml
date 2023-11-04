@@ -3,10 +3,27 @@
          xmlns:web="http://xmlns.jcp.org/xml/ns/javaee"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID">
+    <!-- 声明WEB应用的名字 -->
+    <display-name></display-name>
+    <!-- 声明WEB应用的描述信息 -->
+    <description></description>
+    <!-- 声明应用全局的初始化参数 -->
+    <context-param></context-param>
+    <!-- 声明监听器，它在建立、修改和删除会话或servlet环境时得到事件通知 -->
+    <listener></listener>
+    <!-- 声明一个实现javax.servlet.Filter接口的类 -->
+    <filter></filter>
+    <!-- 声明过滤器的拦截路径 -->
+    <filter-mapping></filter-mapping>
+    <!-- session有关的配置，超时值 -->
+    <session-config></session-config>
+    <!-- 在返回特定HTTP状态代码时，或者特定类型的异常被抛出时，能够制定将要显示的页面 -->
+    <error-page></error-page>
+
     <servlet>
         <servlet-name>minisMVC</servlet-name>
         <!-- 指定Servlet对应类，也是Web程序的核心代码 -->
-        <servlet-class>com.minis.web.DispatcherServlet</servlet-class>
+        <servlet-class>com.alatai.mini.web.DispatcherServlet</servlet-class>
         <init-param>
             <!-- 初始化配置文件地址，表示所有的配置参数都由这里引入 -->
             <!-- contextConfigLocation：它配置了控制器要找的逻辑 -->
